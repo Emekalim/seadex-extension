@@ -33,7 +33,7 @@ class SeadexExtension {
         seeders: 0,
         leechers: 0,
         downloads: 0,
-        accuracy: "high",
+        accuracy: "high"
       }));
   }
 
@@ -43,15 +43,11 @@ class SeadexExtension {
   async test() {
     try {
       if (!(await fetch(this.url)).ok) {
-        throw new Error(
-          `Failed to load data from ${this.url}! Is the site down?`
-        );
+        throw new Error(`Failed to load data from ${this.url}! Is the site down?`);
       }
       return true;
     } catch (error) {
-      throw new Error(
-        `Could not reach ${this.url}! Does the site work in your region?`
-      );
+      throw new Error(`Could not reach ${this.url}! Does the site work in your region?`);
     }
   }
 }

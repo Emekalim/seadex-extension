@@ -1,0 +1,13 @@
+[
+  {
+    "id": "seadex",
+    "name": "Seadex",
+    "version": "0.0.5",
+    "main": "seadex.js",
+    "update": "gh:emekalim/seadex-extension",
+    "type": "torrent",
+    "accuracy": "high",
+    "languages": ["US"],
+    "icon": "https://releases.moe/favicon.png"
+  }
+]

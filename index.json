@@ -3,7 +3,7 @@
     "id": "seadex",
     "name": "Seadex",
     "version": "0.0.5",
-    "main": "seadex.js",
+    "main": "https://raw.githubusercontent.com/emekalim/seadex-extension/main/seadex.js",
     "update": "https://raw.githubusercontent.com/emekalim/seadex-extension/main/index.json",
     "type": "torrent",
     "accuracy": "high",

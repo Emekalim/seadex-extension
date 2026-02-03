@@ -13,14 +13,8 @@ export default new class PirateBay extends AbstractSource {
    * @returns {Promise<TorrentResult[]>}
    */
   async single({ titles, episode }) {
-    console.log('[piratebaysrc] single() called with titles:', titles, 'episode:', episode)
-    if (!titles?.length) {
-      console.log('[piratebaysrc] No titles provided, returning empty')
-      return []
-    }
-    const results = await this._search(titles[0], episode)
-    console.log('[piratebaysrc] single() returning', results.length, 'results')
-    return results
+    if (!titles?.length) return []
+    return this._search(titles[0], episode)
   }
 
   /**
@@ -28,9 +22,7 @@ export default new class PirateBay extends AbstractSource {
    * @returns {Promise<TorrentResult[]>}
    */
   async batch(options) {
-    const results = await this.single(options)
-    console.log('[piratebaysrc] batch() returning', results.length, 'results')
-    return results
+    return this.single(options)
   }
 
   /**
@@ -38,10 +30,7 @@ export default new class PirateBay extends AbstractSource {
    * @returns {Promise<TorrentResult[]>}
    */
   async movie(options) {
-    console.log('[piratebaysrc] movie() called with options:', JSON.stringify({titles: options.titles, mediaType: options.mediaType}))
-    const results = await this.single(options)
-    console.log('[piratebaysrc] movie() returning', results.length, 'results')
-    return results
+    return this.single(options)
   }
 
   /**
@@ -56,34 +45,14 @@ export default new class PirateBay extends AbstractSource {
       if (episode) query += ` ${episode.toString().padStart(2, "0")}`
 
       const url = this.base + encodeURIComponent(query)
-      console.log('[piratebaysrc] _search() - Fetching from URL:', url)
-      console.log('[piratebaysrc] _search() - Full base:', this.base, 'query:', query, 'encoded:', encodeURIComponent(query))
+      const res = await fetch(url)
       
-      let res
-      try {
-        res = await fetch(url)
-      } catch (fetchErr) {
-        console.error('[piratebaysrc] _search() - fetch() threw error:', fetchErr.message)
-        throw fetchErr
-      }
-      
-      console.log('[piratebaysrc] _search() - Response status:', res.status, 'ok:', res.ok)
       if (!res.ok) {
-        console.log('[piratebaysrc] _search() - Response not ok, throwing error')
         throw new Error(`HTTP ${res.status}: ${res.statusText}`)
       }
 
-      let data
-      try {
-        data = await res.json()
-      } catch (jsonErr) {
-        console.error('[piratebaysrc] _search() - res.json() threw error:', jsonErr.message)
-        throw jsonErr
-      }
-      
-      console.log('[piratebaysrc] _search() - Got', Array.isArray(data) ? data.length : 0, 'results from API')
+      const data = await res.json()
       if (!Array.isArray(data)) {
-        console.log('[piratebaysrc] _search() - Data is not an array:', typeof data, JSON.stringify(data).substring(0, 100))
         throw new Error(`Expected array, got ${typeof data}`)
       }
 
@@ -92,24 +61,24 @@ export default new class PirateBay extends AbstractSource {
           return {
             title: item.Name,
             link: item.Magnet,
-            hash: item.Magnet?.match(/btih:([A-Fa-f0-9]+)/)\?.[1] || "",
+            hash: item.Magnet?.match(/btih:([A-Fa-f0-9]+)/)?.[1] || "",
             seeders: Number(item.Seeders || 0),
             leechers: Number(item.Leechers || 0),
-            downloads: 0,  // Not provided by Pirate Bay API
+            downloads: 0,
             size: this._parseSize(item.Size),
             date: this._parseDate(item.DateUploaded),
             accuracy: "medium",
             type: "alt"
           }
         } catch (itemError) {
-          console.warn('[piratebaysrc] _search() - Failed to parse item:', item.Name, itemError.message)
-          return null  // Return null for failed items
+          console.warn('[piratebaysrc] Failed to parse item:', item.Name, itemError.message)
+          return null
         }
-      }).filter(item => item !== null).slice(0, 30)  // Filter out failed items, limit to top 30 results
-      console.log('[piratebaysrc] _search() - Returning', results.length, 'results after parsing')
+      }).filter(item => item !== null).slice(0, 30)
+      
       return results
     } catch (error) {
-      console.error('[piratebaysrc] _search() - Caught error:', error.message, 'stack:', error.stack)
+      console.error('[piratebaysrc] Error in _search:', error.message)
       throw error
     }
   }

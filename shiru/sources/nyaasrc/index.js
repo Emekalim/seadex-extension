@@ -6,7 +6,7 @@ import AbstractSource from '../abstract.js'
  */
 
 export default new class Nyaa extends AbstractSource {
-  base = 'https://torrent-search-api-livid.vercel.app/api/nyaasi/'
+  base = 'https://torrent-search-api-livid.vercel.app/api/piratebay/'
 
   /**
    * @param {TorrentQuery} options

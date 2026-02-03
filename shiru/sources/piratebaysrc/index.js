@@ -5,17 +5,17 @@ import AbstractSource from '../abstract.js'
  * @typedef {import('../sources/index.js').TorrentResult} TorrentResult
  */
 
-export default new class Nyaa extends AbstractSource {
+export default new class PirateBay extends AbstractSource {
   base = 'https://torrent-search-api-livid.vercel.app/api/piratebay/'
 
   /**
    * @param {TorrentQuery} options
    * @returns {Promise<TorrentResult[]>}
    */
-  async single({ titles, episode }) {
-    if (!titles?.length) return []
-    return this._search(titles[0], episode)
-  }
+async single({ titles, episode, season, mediaType, year }) {
+  if (!titles?.length) return []
+  return this._search(titles[0], { episode, season, mediaType, year })
+}
 
   /**
    * @param {TorrentQuery} options
@@ -39,18 +39,38 @@ export default new class Nyaa extends AbstractSource {
    * @param {number} [episode]
    * @returns {Promise<TorrentResult[]>}
    */
-  async _search(title, episode) {
-    let query = title.replace(/[^\w\s-]/g, " ").trim()
-
-    const url = this.base + encodeURIComponent(query)
-    console.log("url:", url)
-    console.log("updated")
-    const res = await fetch(url)
-    
-    if (!res.ok) return []
-
-    const data = await res.json()
-    if (!Array.isArray(data)) return []
+async _search(title, { episode, season, mediaType, year }) {
+  let query = title.replace(/[^\w\s-]/g, " ").trim()
+  
+  // Apply media-specific query formatting
+  switch (mediaType) {
+    case 'movie':
+      // Movies: append year if available
+      if (year) query += ` ${year}`
+      break
+      
+    case 'tv':
+      // TV Shows: format as S##E## (season/episode)
+      if (season && episode) {
+        query += ` S${season.toString().padStart(2, "0")}E${episode.toString().padStart(2, "0")}`
+      } else if (episode) {
+        // Default to S01 if season not provided
+        query += ` S01E${episode.toString().padStart(2, "0")}`
+      }
+      break
+      
+    case 'anime':
+    default:
+      // Anime: keep current behavior (episode only)
+      if (episode) query += ` ${episode.toString().padStart(2, "0")}`
+  }
+  
+  const url = this.base + encodeURIComponent(query)
+  const res = await fetch(url)
+  if (!res.ok) return []
+  
+  const data = await res.json()
+  if (!Array.isArray(data)) return []
 
     return data.map(item => ({
       title: item.Name,

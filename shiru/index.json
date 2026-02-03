@@ -8,7 +8,7 @@
     "nsfw": false,
     "description": "Shiru extension for Nyaa (custom)",
     "icon": "https://nyaa.si/static/favicon.png",
-    "update": "gh:Emekalim/SourceExtensions/shiru"
+    "update": "gh:Emekalim/SourceExtensions_1/shiru"
   },
   {
     "id": "sukebeisrc",
@@ -19,7 +19,7 @@
     "nsfw": true,
     "description": "Shiru extension for Sukebei (custom)",
     "icon": "https://sukebei.nyaa.si/static/favicon.png",
-    "update": "gh:Emekalim/SourceExtensions/shiru"
+    "update": "gh:Emekalim/SourceExtensions_1/shiru"
   },
   {
     "id": "piratebaysrc",
@@ -30,6 +30,6 @@
     "nsfw": false,
     "description": "Shiru extension for Pirate Bay (movies & TV)",
     "icon": "https://sukebei.nyaa.si/static/favicon.png",
-    "update": "gh:Emekalim/SourceExtensions/shiru"
+    "update": "gh:Emekalim/SourceExtensions_1/shiru"
   }
 ]

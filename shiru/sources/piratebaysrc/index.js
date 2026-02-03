@@ -44,6 +44,7 @@ export default new class Nyaa extends AbstractSource {
 
     const url = this.base + encodeURIComponent(query)
     console.log("url:", url)
+    console.log("updated")
     const res = await fetch(url)
     
     if (!res.ok) return []

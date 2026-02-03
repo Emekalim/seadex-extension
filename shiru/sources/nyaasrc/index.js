@@ -6,7 +6,7 @@ import AbstractSource from '../abstract.js'
  */
 
 export default new class Nyaa extends AbstractSource {
-  base = 'https://torrent-search-api-livid.vercel.app/api/piratebay/'
+  base = 'https://torrent-search-api-livid.vercel.app/api/nyaasi/'
 
   /**
    * @param {TorrentQuery} options
@@ -41,12 +41,10 @@ export default new class Nyaa extends AbstractSource {
    */
   async _search(title, episode) {
     let query = title.replace(/[^\w\s-]/g, " ").trim()
+    if (episode) query += ` ${episode.toString().padStart(2, "0")}`
 
     const url = this.base + encodeURIComponent(query)
-    console.log("url:", url)
-    console.log("updated")
     const res = await fetch(url)
-    
     if (!res.ok) return []
 
     const data = await res.json()

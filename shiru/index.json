@@ -3,7 +3,7 @@
     "id": "piratebaysrc",
     "name": "Pirate Bay SRC",
     "version": "1.0.0",
-    "main": "sources/nyaasrc",
+    "main": "sources/piratebaysrc",
     "type": "torrent",
     "nsfw": false,
     "description": "Shiru extension for Pirate Bay (movies & TV)",

@@ -41,10 +41,12 @@ export default new class Nyaa extends AbstractSource {
    */
   async _search(title, episode) {
     let query = title.replace(/[^\w\s-]/g, " ").trim()
-    if (episode) query += ` ${episode.toString().padStart(2, "0")}`
+    // if (episode) query += ` ${episode.toString().padStart(2, "0")}`
 
     const url = this.base + encodeURIComponent(query)
+    console.log("url:", url)
     const res = await fetch(url)
+    
     if (!res.ok) return []
 
     const data = await res.json()

@@ -5,7 +5,7 @@ import AbstractSource from '../abstract.js'
  * @typedef {import('../sources/index.js').TorrentResult} TorrentResult
  */
 
-export default new class PirateBay extends AbstractSource {
+export default new class Nyaa extends AbstractSource {
   base = 'https://torrent-search-api-livid.vercel.app/api/piratebay/'
 
   /**

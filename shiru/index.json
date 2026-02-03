@@ -19,7 +19,7 @@
     "nsfw": true,
     "description": "Shiru extension for Sukebei (custom)",
     "icon": "https://sukebei.nyaa.si/static/favicon.png",
-    "update": "gh:Emekalim/SourceExtensions//shiru"
+    "update": "gh:Emekalim/SourceExtensions/shiru"
   },
   {
     "id": "piratebaysrc",

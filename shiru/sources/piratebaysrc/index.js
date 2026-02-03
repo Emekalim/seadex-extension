@@ -13,7 +13,11 @@ export default new class PirateBay extends AbstractSource {
    * @returns {Promise<TorrentResult[]>}
    */
   async single({ titles, episode }) {
-    if (!titles?.length) return []
+    console.log('[piratebaysrc] single() called with titles:', titles, 'episode:', episode)
+    if (!titles?.length) {
+      console.log('[piratebaysrc] No titles provided, returning empty')
+      return []
+    }
     return this._search(titles[0], episode)
   }
 
@@ -30,6 +34,7 @@ export default new class PirateBay extends AbstractSource {
    * @returns {Promise<TorrentResult[]>}
    */
   async movie(options) {
+    console.log('[piratebaysrc] movie() called with options:', JSON.stringify({titles: options.titles, mediaType: options.mediaType}))
     return this.single(options)
   }
 
@@ -40,28 +45,44 @@ export default new class PirateBay extends AbstractSource {
    * @returns {Promise<TorrentResult[]>}
    */
   async _search(title, episode) {
-    let query = title.replace(/[^\w\s-]/g, " ").trim()
-    if (episode) query += ` ${episode.toString().padStart(2, "0")}`
+    try {
+      let query = title.replace(/[^\w\s-]/g, " ").trim()
+      if (episode) query += ` ${episode.toString().padStart(2, "0")}`
 
-    const url = this.base + encodeURIComponent(query)
-    const res = await fetch(url)
-    if (!res.ok) return []
+      const url = this.base + encodeURIComponent(query)
+      console.log('[piratebaysrc] Fetching from URL:', url)
+      const res = await fetch(url)
+      console.log('[piratebaysrc] Response status:', res.status, 'ok:', res.ok)
+      if (!res.ok) {
+        console.log('[piratebaysrc] Response not ok, throwing error')
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+      }
 
-    const data = await res.json()
-    if (!Array.isArray(data)) return []
+      const data = await res.json()
+      console.log('[piratebaysrc] Got', Array.isArray(data) ? data.length : 0, 'results')
+      if (!Array.isArray(data)) {
+        console.log('[piratebaysrc] Data is not an array:', typeof data, data)
+        throw new Error(`Expected array, got ${typeof data}`)
+      }
 
-    return data.map(item => ({
-      title: item.Name,
-      link: item.Magnet,
-      hash: item.Magnet?.match(/btih:([A-Fa-f0-9]+)/)?.[1] || "",
-      seeders: Number(item.Seeders || 0),
-      leechers: Number(item.Leechers || 0),
-      downloads: 0,  // Not provided by Pirate Bay API
-      size: this._parseSize(item.Size),
-      date: this._parseDate(item.DateUploaded),
-      accuracy: "medium",
-      type: "alt"
-    }))
+      const results = data.map(item => ({
+        title: item.Name,
+        link: item.Magnet,
+        hash: item.Magnet?.match(/btih:([A-Fa-f0-9]+)/)?.[1] || "",
+        seeders: Number(item.Seeders || 0),
+        leechers: Number(item.Leechers || 0),
+        downloads: 0,  // Not provided by Pirate Bay API
+        size: this._parseSize(item.Size),
+        date: this._parseDate(item.DateUploaded),
+        accuracy: "medium",
+        type: "alt"
+      })).slice(0, 30)  // Limit to top 30 results
+      console.log('[piratebaysrc] Returning', results.length, 'results')
+      return results
+    } catch (error) {
+      console.error('[piratebaysrc] Error in _search:', error.message, error.stack)
+      throw error
+    }
   }
 
   /**
